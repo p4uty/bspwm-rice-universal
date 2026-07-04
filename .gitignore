@@ -1,0 +1,7 @@
+# Estado / generados (se recrean solos)
+.config/bspwm/config/.sys
+.config/bspwm/config/.first_run_done
+.config/kitty/current-theme.conf
+.config/bspwm/eww/colors.scss
+**/*.bak
+**/__pycache__/

@@ -1,0 +1,36 @@
+#!/bin/sh
+# =============================================================
+# WallWatch - Guarda automaticamente el fondo de pantalla actual
+#             en el DEFAULT_WALL del rice activo, cada vez que
+#             cambia ~/.fehbg (WallSelect, feh manual, etc.).
+#             Asi el fondo de cada tema persiste tras reiniciar.
+# Dependencias: inotify-tools (inotifywait), feh
+# =============================================================
+
+FEHBG="$HOME/.fehbg"
+
+save_current() {
+    [ -f "$FEHBG" ] || return
+    wall=$(awk -F"'" '/--bg/{print $2}' "$FEHBG" | tail -1)
+    [ -n "$wall" ] && [ -f "$wall" ] || return
+
+    read -r rice < "$HOME/.config/bspwm/.rice" 2>/dev/null || return
+    cfg="$HOME/.config/bspwm/rices/$rice/theme-config.bash"
+    [ -f "$cfg" ] || return
+
+    # Evitar escrituras si ya esta guardado
+    cur=$(awk -F'"' '/^DEFAULT_WALL=/{print $2}' "$cfg")
+    [ "$cur" = "$wall" ] && return
+
+    sed -i -e 's/^ENGINE=.*/ENGINE="Default"/' \
+           -e "s|^DEFAULT_WALL=.*|DEFAULT_WALL=\"$wall\"|" "$cfg"
+}
+
+# Guardar el estado actual al arrancar
+save_current
+
+# Vigilar cambios en ~/.fehbg (se re-arma aunque el archivo sea reemplazado)
+inotifywait -m -q -e close_write,moved_to,create --format '%f' "$HOME" 2>/dev/null |
+while read -r f; do
+    [ "$f" = ".fehbg" ] && save_current
+done

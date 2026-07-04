@@ -1,0 +1,24 @@
+#!/bin/sh
+# =============================================================
+# SysUpdate - Actualiza el sistema detectando el gestor de paquetes.
+#             Multi-distro: Arch / Fedora / Debian-Ubuntu / openSUSE.
+# =============================================================
+
+if command -v paru >/dev/null 2>&1; then                 # Arch (con helper AUR)
+    paru -Syu
+elif command -v yay >/dev/null 2>&1; then
+    yay -Syu
+elif command -v pacman >/dev/null 2>&1; then             # Arch
+    sudo pacman -Syu
+elif command -v dnf >/dev/null 2>&1; then                 # Fedora
+    sudo dnf upgrade
+elif command -v apt >/dev/null 2>&1; then                 # Debian / Ubuntu
+    sudo apt update && sudo apt upgrade
+elif command -v zypper >/dev/null 2>&1; then              # openSUSE
+    sudo zypper dup
+else
+    echo "No se detectó un gestor de paquetes soportado."
+fi
+
+printf "\nPulsa Enter para cerrar..."
+read -r _
