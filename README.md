@@ -72,7 +72,7 @@ Las derivadas (EndeavourOS, Manjaro, Nobara, Mint, Pop!_OS…) se detectan por
 > Tus configuraciones actuales se mueven a `~/.RiceBackup/<fecha>/` antes de copiar las nuevas.
 
 ```bash
-git clone https://github.com/juanpt1/bspwm-rice-universal.git
+git clone https://github.com/p4uty/bspwm-rice-universal.git
 cd bspwm-rice-universal
 ./install.sh
 ```
@@ -416,7 +416,7 @@ distro que hayas tocado). Si reportas un fallo, adjunta el log de
 - Basado en **[gh0stzk/dotfiles](https://github.com/gh0stzk/dotfiles)**: scripts,
   temas, configuración de polybar, rofi y eww.
 - Temas GTK, iconos, cursor y fuentes de iconos: paquetes de gh0stzk.
-- Adaptación multi-distro y personalizaciones: [juanpt1](https://github.com/juanpt1).
+- Adaptación multi-distro y personalizaciones: [p4uty](https://github.com/p4uty).
 
 Licencia: **[GPL-3.0](LICENSE)**, la misma que el proyecto original. Las fuentes de
 `assets/fonts/` mantienen sus propias licencias (ver [assets/fonts/README.md](assets/fonts/README.md)).
