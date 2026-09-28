@@ -46,8 +46,11 @@ sleep 2
 export DISPLAY=:99
 dbus-run-session -- bash "$(dirname "$0")/session.sh" "$OUT" >"$OUT/session.txt" 2>&1
 kill %1 2>/dev/null
-ls /usr/bin/lxpolkit /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 /usr/libexec/polkit-mate-authentication-agent-1 2>/dev/null | grep -q . \
-    && ok "agente polkit instalado" || note "sin agente polkit"
+agent=""
+for a in /usr/bin/lxpolkit /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 /usr/libexec/polkit-mate-authentication-agent-1; do
+    [ -x "$a" ] && agent="$a"
+done
+[ -n "$agent" ] && ok "agente polkit instalado ($agent)" || note "sin agente polkit"
 while read -r kind what; do
     case $kind in
         PROC_OK|RICE_OK) ok "$kind $what" ;;

@@ -8,7 +8,8 @@ sleep 15
 for p in bspwm sxhkd polybar picom dunst xsettingsd; do
     pgrep -x "$p" >/dev/null && echo "PROC_OK $p" || echo "PROC_MISSING $p"
 done
-for rice in $(ls ~/.config/bspwm/rices); do
+for dir in ~/.config/bspwm/rices/*/; do
+    rice=$(basename "$dir")
     echo "$rice" > ~/.config/bspwm/.rice
     timeout 60 Theme.sh >"$OUT/theme-$rice.log" 2>&1 || echo "RICE_TIMEOUT $rice"
     sleep 6
@@ -17,7 +18,8 @@ for rice in $(ls ~/.config/bspwm/rices); do
 done
 # Salida de polybar/picom con mensajes (Bar.bash los lanza en modo silencioso)
 pkill -x polybar; sleep 1
-for rice in $(ls ~/.config/bspwm/rices); do
+for dir in ~/.config/bspwm/rices/*/; do
+    rice=$(basename "$dir")
     bar=$(grep -oE "polybar -q [^ ]+" ~/.config/bspwm/rices/"$rice"/Bar.bash | head -1 | cut -d" " -f3)
     timeout 4 polybar "$bar" -c ~/.config/bspwm/rices/"$rice"/config.ini >"$OUT/polybar-$rice.log" 2>&1
 done

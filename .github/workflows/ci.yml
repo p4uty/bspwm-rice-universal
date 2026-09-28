@@ -11,7 +11,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: shellcheck
         run: shellcheck -S warning install.sh tests/*.sh
 
@@ -23,7 +23,7 @@ jobs:
         image: ["archlinux:latest", "fedora:43", "debian:12", "debian:13", "ubuntu:24.04"]
     container: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Comprobar que existen los paquetes de install.sh
         run: bash tests/check-packages.sh
 
@@ -36,10 +36,10 @@ jobs:
       matrix:
         distro: [arch, fedora, debian12, debian13, ubuntu2404]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Instalar y probar en contenedor
         run: ENGINE=docker tests/run-tests.sh ${{ matrix.distro }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: resultados-${{ matrix.distro }}
