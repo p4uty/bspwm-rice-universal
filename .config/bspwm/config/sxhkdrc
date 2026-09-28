@@ -126,7 +126,7 @@ XF86Audio{Next,Prev,Play,Stop}
 
 # Tecla calculadora
 XF86Calculator
-    kcalc
+    OpenApps --calculator
 
 # Silenciar/activar microfono
 XF86AudioMicMute
@@ -240,8 +240,8 @@ super + alt + {plus,minus}
 # increase/decrease FLOATING node size (zoom in/out)
 super + ctrl + {plus,minus}
     { \
-	xdotool getactivewindow windowmove --relative -- -50 -25 ; xdo resize -w +100 -h +50; \
-	, xdotool getactivewindow windowmove --relative -- +50 +25 ; xdo resize -w -100 -h -50; \
+	bspc node -z top_left -50 -25 ; bspc node -z bottom_right 50 25; \
+	, bspc node -z top_left 50 25 ; bspc node -z bottom_right -50 -25; \
     }
 
 # Move floating window

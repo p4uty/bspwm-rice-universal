@@ -23,9 +23,11 @@ read -r RICE < "$HOME"/.config/bspwm/.rice
 MODULE_DIR="$HOME/.config/bspwm/config/modules"
 
 # Function to wait for processes to finish correctly
+# -x: nombre exacto (pgrep -f con "polybar" también coincidía con, p. ej., "nvim polybar.ini" y se colgaba)
 wait_for_termination() {
+    match="-f"; [ "$1" = "-x" ] && { match="-x"; shift; }
     process_name="$1"
-    while pgrep -f "$process_name" >/dev/null; do
+    while pgrep "$match" "$process_name" >/dev/null; do
         sleep 0.05
     done
 }
@@ -33,7 +35,7 @@ wait_for_termination() {
 # Kill polybar or eww bars when you switch from the current theme to another
 if pgrep -x polybar >/dev/null 2>&1; then
     polybar-msg cmd quit >/dev/null 2>&1
-    wait_for_termination polybar
+    wait_for_termination -x polybar
 fi
 
 # Kill eww bars
@@ -48,7 +50,7 @@ fi
 
 # Kill animated wallpaper if is active
 if pkill xwinwrap >/dev/null 2>&1; then
-    wait_for_termination xwinwrap
+    wait_for_termination -x xwinwrap
 fi
 
 # Kill wallpaper refresh loop

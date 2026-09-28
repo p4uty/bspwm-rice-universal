@@ -15,7 +15,7 @@
 # Dependencies:
 #   - bspwm (>= 0.9.10)
 #   - jq (JSON processing)
-#   - xdo (window operations)
+#   - xdotool (window operations; antes xdo, que no existe en Fedora)
 #   - xprop (window identification)
 #
 # Copyright (C) 2021-2026 gh0stzk <z0mbi3.zk@protonmail.com>
@@ -78,8 +78,8 @@ if [ -n "$WINDOW_ID" ]; then
     else
         # If hidden: move, resize and show
         bspc node "$WINDOW_ID" -m focused
-        xdo move -x "$X_POS" -y "$Y_POS" "$WINDOW_ID"
-        xdo resize -w "$WIDTH" -h "$HEIGHT" "$WINDOW_ID"
+        xdotool windowmove "$WINDOW_ID" "$X_POS" "$Y_POS"
+        xdotool windowsize "$WINDOW_ID" "$WIDTH" "$HEIGHT"
         bspc node "$WINDOW_ID" -g hidden=off -f
     fi
 else
@@ -109,8 +109,8 @@ else
     # Wait and adjust final position
     sleep 0.3
     WINDOW_ID=$(get_scratchpad_id)
-    xdo move -x "$X_POS" -y "$Y_POS" "$WINDOW_ID"
-    xdo resize -w "$WIDTH" -h "$HEIGHT" "$WINDOW_ID"
+    xdotool windowmove "$WINDOW_ID" "$X_POS" "$Y_POS"
+    xdotool windowsize "$WINDOW_ID" "$WIDTH" "$HEIGHT"
 fi
 
 # Update when changing monitor
@@ -123,8 +123,8 @@ bspc subscribe monitor_focus | while read -r _; do
         # Move and resize only if visible
         if [ "$(bspc query -T -n "$WINDOW_ID" | jq -r '.client.state')" = "floating" ]; then
             bspc node "$WINDOW_ID" -m focused
-            xdo move -x "$X_POS" -y "$Y_POS" "$WINDOW_ID"
-            xdo resize -w "$WIDTH" -h "$HEIGHT" "$WINDOW_ID"
+            xdotool windowmove "$WINDOW_ID" "$X_POS" "$Y_POS"
+            xdotool windowsize "$WINDOW_ID" "$WIDTH" "$HEIGHT"
         fi
     fi
 done &

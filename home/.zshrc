@@ -8,9 +8,12 @@
 #  ┬  ┬┌─┐┬─┐┌─┐
 #  └┐┌┘├─┤├┬┘└─┐
 #   └┘ ┴ ┴┴└─└─┘
-export VISUAL="${EDITOR}"
 export EDITOR='geany'
-export BROWSER='brave-browser'
+export VISUAL="${EDITOR}"
+# Navegador: el primero disponible
+for _b in brave-browser brave firefox chromium; do
+  command -v "$_b" >/dev/null 2>&1 && { export BROWSER="$_b"; break; }
+done; unset _b
 export HISTORY_IGNORE="(ls|cd|pwd|exit|sudo reboot|history|cd -|cd ..)"
 export SUDO_PROMPT="Deploying root access for %u. Password pls: "
 export BAT_THEME="base16"
@@ -113,11 +116,21 @@ PS1='%B%F{blue}%f%b  %B%F{magenta}%n%f%b $(dir_icon)  %B%F{red}%~%f%b${vcs_in
 #  ┌─┐┬  ┬ ┬┌─┐┬┌┐┌┌─┐
 #  ├─┘│  │ ││ ┬││││└─┐
 #  ┴  ┴─┘└─┘└─┘┴┘└┘└─┘
-# Rutas adaptadas a Fedora (originales eran de Arch)
-source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.zsh"
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source "$HOME/.config/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+# Carga un plugin desde la primera ruta que exista (cambian entre distros:
+# Arch usa /usr/share/zsh/plugins/..., Fedora/Debian /usr/share/...)
+_load_plugin() {
+  local f
+  for f in "$@"; do [[ -r "$f" ]] && { source "$f"; return 0; }; done
+  return 1
+}
+_load_plugin "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.zsh"
+_load_plugin /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+             /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh \
+             "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+_load_plugin /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+             /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+             "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+_load_plugin "$HOME/.config/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -160,13 +173,20 @@ fi
 [ -f /boot/grub/grub.cfg ]  && alias grub-update="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
 
-alias cat="bat --theme=base16"
+# bat (en Debian/Ubuntu el binario se llama batcat)
+if command -v bat >/dev/null 2>&1; then
+  alias cat="bat --theme=base16"
+elif command -v batcat >/dev/null 2>&1; then
+  alias bat="batcat"; alias cat="batcat --theme=base16"
+fi
 # eza: listado detallado a color (permisos, usuario, grupo, tamano, fecha, git)
-EZA_OPTS='--icons=always --color=always --group-directories-first --group --header'
-alias ls="eza -l $EZA_OPTS"   # detallado por defecto
-alias ll="eza -la $EZA_OPTS --git"   # igual (detallado)
-alias la="eza -a --icons=always --color=always --group-directories-first"  # rejilla, solo nombres
-alias lt="eza -la $EZA_OPTS --tree --level=2"  # arbol 2 niveles
+if command -v eza >/dev/null 2>&1; then
+  EZA_OPTS='--icons=always --color=always --group-directories-first --group --header'
+  alias ls="eza -l $EZA_OPTS"   # detallado por defecto
+  alias ll="eza -la $EZA_OPTS --git"   # igual (detallado)
+  alias la="eza -a --icons=always --color=always --group-directories-first"  # rejilla, solo nombres
+  alias lt="eza -la $EZA_OPTS --tree --level=2"  # arbol 2 niveles
+fi
 
 #  ┌─┐┬ ┬┌┬┐┌─┐  ┌─┐┌┬┐┌─┐┬─┐┌┬┐
 #  ├─┤│ │ │ │ │  └─┐ │ ├─┤├┬┘ │

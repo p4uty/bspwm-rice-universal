@@ -1,35 +1,24 @@
-Hello, welcome to BSPWM
+¡Bienvenido a bspwm!
 
-Maybe it's your first time using a window manager or maybe not, here are some tips so you don't feel so lost.
-  · You can always visit my Wiki https://github.com/gh0stzk/dotfiles/wiki
+Este mensaje solo aparece la primera vez. Algunos atajos para empezar
+(super = tecla Windows):
 
-    - (Alt + F1) For a list of all keyboard shortcuts (If it doesn't open, please visit https://github.com/gh0stzk/dotfiles/wiki/Installing-EWW)
-    - (Super + Enter) Opens the terminal
-    - (Super + x) To close windows/apps.
-    - (Super + Space bar) Opens the apps menu
-    - (Alt + Space bar) Open the menu to change the theme
-    - (Super + arrows) Move between workspaces (there are *6)
+    super + c              Hoja con todos los atajos (requiere eww)
+    super + Enter          Abrir la terminal
+    super + Espacio        Menú de aplicaciones
+    super + x              Cerrar la ventana
+    alt + Espacio          Cambiar de tema (emilia, cristina, h4ck3r)
+    super + alt + w        Elegir wallpaper (se guarda por tema)
+    super + 1..0           Cambiar de escritorio
+    super + alt + t        Elegir terminal (kitty / alacritty)
+    super + alt + o        Terminal desplegable (scratchpad)
+    super + alt + s        Capturas de pantalla
+    super + alt + p        Menú de apagado
+    super + alt + h / u    Ocultar / mostrar la barra
+    super + alt + r        Reiniciar bspwm
 
-Remember that I tried to make the environment in a MINIMALIST way but giving you what you need to make it comfortable and efficient for your daily work. However, some of the features you can find are:
+Todos los atajos están en ~/.config/bspwm/config/sxhkdrc; puedes editarlos
+y recargarlos con super + Escape.
 
-    - A menu to manage your connections which you can access by clicking on the   icon in the different bars.
-
-    - If your computer has Bluetooth, the icon will appear in the different bars and open a Bluetooth manager. But you should always have a specialized app like Blueman.
-
-    - Scratchpad (super + alt + o)
-
-    - Clipboard Manager (super + alt + c)
-
-    - Terminal Selector (super + alt + t) You can choose between 2 terminals, "Alacritty" and "Kitty". By default, it is Alacritty.
-
-    - Wallpaper selector (super + alt + w) The first time you run it in each theme, it may take 3 to 5 seconds for the menu to appear because the images are being cached the first time.
-
-    - Screenshot menu (super + alt + s)
-
-    - And other features such as hiding the bars (super + alt + h) and (super + alt + u) to show them again.
-
-Please check the menu of all keyboard shortcuts by pressing "Alt + F1" or directly by looking at the file ~/.config/bspwm/sxhkdrc from this file you can create your own keyboard shortcuts or modify the existing ones.
-
-If you have a question or a problem or if you find a bug, you can always create a post at https://github.com/gh0stzk/dotfiles/issues
-
-Using a WM at first can be difficult and intimidating, but once you get used to it, you never go back to a DE.
+Documentación y problemas: consulta el README del repositorio.
+Basado en https://github.com/gh0stzk/dotfiles

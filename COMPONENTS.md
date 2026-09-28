@@ -1,158 +1,193 @@
-# 🧱 COMPONENTS.md — Componentes y equivalencias por distro
+# 🧱 COMPONENTS.md: componentes y equivalencias por distro
 
-Documento técnico de **todos** los componentes que usa este rice de bspwm, su
-**rol**, y el **nombre del paquete en cada distro**. Sirve para:
+Documento técnico con **todos** los componentes del rice: qué **rol** cumple cada
+uno y **cómo se llama su paquete en cada distro**. Sirve para:
 
 - Entender qué hace cada pieza.
-- Instalar manualmente en cualquier distro.
-- Portar el `install.sh` a una distro nueva (basta añadir un bloque al `case`).
+- Instalar a mano en cualquier distro.
+- Portar `install.sh` a una distro nueva (basta con añadir un bloque al `case`).
 
 > Los **archivos de configuración** (`.config/*`) son **idénticos en todas las
 > distros**. Lo único que cambia entre distros es **cómo se instalan los paquetes**.
+
+Los nombres de esta tabla se comprobaron en los repositorios oficiales de
+Arch (rolling), Fedora 43, Debian 12, Debian 13 y Ubuntu 24.04 con
+`tests/run-tests.sh`. Para ver exactamente qué instalaría el script en tu
+sistema, sin instalar nada:
+
+```bash
+./install.sh --print-packages
+```
 
 ---
 
 ## 1. Cómo detecta la distro el instalador
 
-`install.sh` lee `/etc/os-release` (`ID` + `ID_LIKE`) y agrupa en **familias**:
+`install.sh` lee `/etc/os-release` (`ID` + `ID_LIKE`) y agrupa las distros en **familias**:
 
-| Familia | Distros | Gestor | Comando de instalación |
+| Familia | Distros | Gestor | Comando que usa |
 |---|---|---|---|
-| `arch` | Arch, Manjaro, EndeavourOS, Artix… | pacman | `pacman -S --needed` |
-| `fedora` | Fedora, RHEL, Nobara… | dnf | `dnf install --skip-unavailable` |
-| `debian` | Debian, Ubuntu, Mint, Pop!_OS… | apt | `apt-get install` |
-| `suse` | openSUSE (Tumbleweed/Leap) | zypper | `zypper install` |
+| `arch` | Arch, EndeavourOS, Manjaro, Artix… | pacman | `pacman -Syu --needed` |
+| `fedora` | Fedora, Nobara… | dnf | `dnf install --skip-unavailable` |
+| `debian` | Debian, Ubuntu, Linux Mint, Pop!_OS… | apt | `apt-get install` |
+| `suse` | openSUSE (Tumbleweed/Leap), **experimental, sin probar** | zypper | `zypper install` |
 
-En Debian/apt y Arch/pacman los paquetes se instalan **uno a uno** para que uno
-ausente no aborte todo (se avisa con `[!]`).
+Primero instala todos los paquetes de golpe. Si falla (por ejemplo, porque un
+nombre no existe en tu versión), reintenta **uno a uno** y avisa de los que
+faltan con `[!]`. Al final muestra un resumen de avisos y comprueba que existan
+los comandos necesarios.
+
+> **Arch:** se usa `pacman -Syu`, así que el instalador **actualiza también el
+> sistema**. En Arch no se deben hacer actualizaciones parciales (`-Sy` + `-S`).
 
 ---
 
 ## 2. Paquetes del sistema (por distro)
 
-Rol → nombre del paquete. `—` = no está en repos oficiales (ver §3/§5).
+`—` = no está en los repos oficiales; se instala como binario (ver §3).
 
-| Componente | Rol | Arch | Fedora | Debian/Ubuntu | openSUSE |
+| Componente | Rol | Arch | Fedora | Debian / Ubuntu | openSUSE |
 |---|---|---|---|---|---|
-| **bspwm** | window manager | `bspwm` | `bspwm` | `bspwm` | `bspwm` |
+| **Xorg** | servidor gráfico X11 | `xorg-server` `xorg-xinit` | `xorg-x11-server-Xorg` `xorg-x11-xinit` | `xserver-xorg` `xinit` | `xorg-x11-server` `xinit` |
+| **bspwm** | gestor de ventanas | `bspwm` | `bspwm` | `bspwm` | `bspwm` |
 | **sxhkd** | atajos de teclado | `sxhkd` | `sxhkd` | `sxhkd` | `sxhkd` |
 | **polybar** | barra | `polybar` | `polybar` | `polybar` | `polybar` |
-| **picom** | compositor | `picom` | `picom` | `picom` | `picom` |
-| **rofi** | lanzador/menús | `rofi` | `rofi` | `rofi` | `rofi` |
-| **dunst** | notificaciones | `dunst` | `dunst` | `dunst` | `dunst` |
+| **picom** | compositor (sombras, transparencias, animaciones) | `picom` | `picom` | `picom` | `picom` |
+| **rofi** | lanzador y menús | `rofi` | `rofi` | `rofi` | `rofi` |
+| **dunst** | notificaciones (incluye `dunstify`) | `dunst` | `dunst` | `dunst` | `dunst` |
 | **feh** | wallpaper | `feh` | `feh` | `feh` | `feh` |
 | **kitty** | terminal | `kitty` | `kitty` | `kitty` | `kitty` |
-| **alacritty** | terminal alt | `alacritty` | `alacritty` | `alacritty` | `alacritty` |
+| **alacritty** | terminal alternativa | `alacritty` | `alacritty` | `alacritty` | `alacritty` |
 | **zsh** | shell | `zsh` | `zsh` | `zsh` | `zsh` |
-| autosuggestions | plugin zsh | `zsh-autosuggestions` | `zsh-autosuggestions` | `zsh-autosuggestions` | (manual) |
-| syntax-highlighting | plugin zsh | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | (manual) |
-| **maim** | captura | `maim` | `maim` | `maim` | `maim` |
+| zsh-autosuggestions | plugin zsh | `zsh-autosuggestions` | `zsh-autosuggestions` | `zsh-autosuggestions` | (a mano) |
+| zsh-syntax-highlighting | plugin zsh | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | `zsh-syntax-highlighting` | (a mano) |
+| **maim** | capturas de pantalla | `maim` | `maim` | `maim` | `maim` |
 | **xclip** | portapapeles X | `xclip` | `xclip` | `xclip` | `xclip` |
-| **xdotool** | automatización X | `xdotool` | `xdotool` | `xdotool` | `xdotool` |
+| **xdotool** | automatización X (scratchpad, jgmenu) | `xdotool` | `xdotool` | `xdotool` | `xdotool` |
 | **brightnessctl** | brillo | `brightnessctl` | `brightnessctl` | `brightnessctl` | `brightnessctl` |
-| xsetroot/xrandr/xrdb | utilidades X | `xorg-xsetroot` `xorg-xrandr` `xorg-xrdb` | `xsetroot` `xrandr` `xrdb` | `x11-xserver-utils` | `xsetroot` `xrandr` `xrdb` |
-| xprop/xwininfo/xdpyinfo/xkill | utilidades X | `xorg-xprop` … | `xprop` `xwininfo` `xdpyinfo` `xkill` | `x11-utils` | idem Fedora |
-| **xsettingsd** | ajustes GTK/X | `xsettingsd` | `xsettingsd` | `xsettingsd` | `xsettingsd` |
+| xsetroot / xrandr / xrdb | utilidades X | `xorg-xsetroot` `xorg-xrandr` `xorg-xrdb` | `xsetroot` `xrandr` `xrdb` | `x11-xserver-utils` | `xsetroot` `xrandr` `xrdb` |
+| xprop / xwininfo / xdpyinfo / xkill | utilidades X | `xorg-xprop` `xorg-xwininfo` `xorg-xdpyinfo` `xorg-xkill` | `xprop` `xwininfo` `xdpyinfo` `xkill` | `x11-utils` | igual que Fedora |
+| setxkbmap | distribución de teclado (bloqueo, KeyBoardL) | `xorg-setxkbmap` | `setxkbmap` | `x11-xkb-utils` | `setxkbmap` |
+| **xsettingsd** | ajustes GTK en caliente | `xsettingsd` | `xsettingsd` | `xsettingsd` | `xsettingsd` |
 | **pamixer** | volumen | `pamixer` | `pamixer` | `pamixer` | `pamixer` |
-| **playerctl** | control media | `playerctl` | `playerctl` | `playerctl` | `playerctl` |
+| pactl | silenciar micrófono | `libpulse` | `pulseaudio-utils` | `pulseaudio-utils` | `pulseaudio-utils` |
+| **playerctl** | control multimedia | `playerctl` | `playerctl` | `playerctl` | `playerctl` |
 | **redshift** | luz nocturna | `redshift` | `redshift` | `redshift` | `redshift` |
-| **Thunar** | gestor archivos GUI | `thunar` | `Thunar` | `thunar` | `thunar` |
+| nmcli | menú de red (NetManagerDM) | `networkmanager` | `NetworkManager` | `network-manager` | `NetworkManager` |
+| bluetoothctl | menú bluetooth | `bluez-utils` | `bluez` | `bluez` | `bluez` |
+| checkupdates | contador de actualizaciones (Arch) | `pacman-contrib` | (usa `dnf`) | (usa `apt-get`) | — |
+| **Thunar** | gestor de archivos gráfico | `thunar` | `Thunar` | `thunar` | `thunar` |
 | **tumbler** | miniaturas | `tumbler` | `tumbler` | `tumbler` | `tumbler` |
-| gvfs-mtp | montaje MTP | `gvfs-mtp` | `gvfs-mtp` | `gvfs-backends` | `gvfs` |
-| **geany** | editor GUI | `geany` | `geany` | `geany` | `geany` |
-| **jgmenu** | menú clic derecho | `jgmenu` | `jgmenu` | `jgmenu` | `jgmenu` |
-| **ImageMagick** | procesar imágenes | `imagemagick` | `ImageMagick` | `imagemagick` | `ImageMagick` |
-| **jq** | parsear JSON | `jq` | `jq` | `jq` | `jq` |
-| libwebp / webp | soporte WebP | `libwebp` | `libwebp` | `webp` | (incluido) |
-| webp-pixbuf-loader | WebP en GTK/rofi | `webp-pixbuf-loader` | `webp-pixbuf-loader` | `webp-pixbuf-loader` | (manual) |
+| gvfs | montar móviles/USB | `gvfs-mtp` | `gvfs-mtp` | `gvfs-backends` | `gvfs` |
+| **geany** | editor gráfico | `geany` | `geany` | `geany` | `geany` |
+| **jgmenu** | menú del clic derecho | `jgmenu` | `jgmenu` | `jgmenu` | `jgmenu` |
+| **ImageMagick** | procesar imágenes (wallpapers, bloqueo) | `imagemagick` | `ImageMagick` | `imagemagick` ¹ | `ImageMagick` |
+| **jq** | procesar JSON | `jq` | `jq` | `jq` | `jq` |
+| soporte WebP | wallpapers `.webp` | `libwebp` `webp-pixbuf-loader` | `libwebp` `webp-pixbuf-loader` | `webp` `webp-pixbuf-loader` | (a mano) |
 | **mpv** | reproductor | `mpv` | `mpv` | `mpv` | `mpv` |
-| **pavucontrol** | mezclador audio | `pavucontrol` | `pavucontrol` | `pavucontrol` | `pavucontrol` |
-| **keepassxc** | gestor contraseñas | `keepassxc` | `keepassxc` | `keepassxc` | `keepassxc` |
-| lxsession | provee `lxpolkit` | `lxsession` | `lxsession` | `lxsession` | `lxsession` |
-| polkit-gnome | agente polkit | `polkit-gnome` | `polkit-gnome` | `policykit-1-gnome` | `polkit-gnome` |
-| **bat** | `cat` con color | `bat` | `bat` | `bat` (`batcat`) | `bat` |
-| **bc** | calculadora shell | `bc` | `bc` | `bc` | `bc` |
-| **eza** | `ls` moderno | `eza` | `eza` | — (binario, §3) | — (binario) |
-| **fzf** | fuzzy finder | `fzf` | `fzf` | `fzf` | `fzf` |
+| **pavucontrol** | mezclador de audio | `pavucontrol` | `pavucontrol` | `pavucontrol` | `pavucontrol` |
+| **keepassxc** | gestor de contraseñas | `keepassxc` | `keepassxc` | `keepassxc` | `keepassxc` |
+| agente polkit | ventana que pide la contraseña de administrador en apps gráficas | `polkit-gnome` | `mate-polkit` | `lxpolkit` | `lxsession` |
+| **bat** | `cat` con color | `bat` | `bat` | `bat` ² | `bat` |
+| **bc** | calculadora de shell | `bc` | `bc` | `bc` | `bc` |
+| **eza** | `ls` moderno | `eza` | `eza` | `eza` (Debian 13, Ubuntu) / — (Debian 12) | — |
+| **fzf** | buscador difuso | `fzf` | `fzf` | `fzf` ³ | `fzf` ³ |
 | **ripgrep** | grep rápido | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` |
-| **bottom** (`btm`) | monitor sistema | `bottom` | `bottom` | — (binario, §3) | — (binario) |
+| **bottom** (`btm`) | monitor del sistema | `bottom` | — | — | — |
 | inotify-tools | vigilar archivos (WallWatch) | `inotify-tools` | `inotify-tools` | `inotify-tools` | `inotify-tools` |
 | papirus-icon-theme | iconos GTK | `papirus-icon-theme` | `papirus-icon-theme` | `papirus-icon-theme` | `papirus-icon-theme` |
-| python-gobject | scripts eww/rofi | `python-gobject` | `python3-gobject` | `python3-gi` | `python3-gobject` |
-| xdg-user-dirs | carpetas usuario | `xdg-user-dirs` | `xdg-user-dirs` | `xdg-user-dirs` | `xdg-user-dirs` |
-| JetBrains Mono | fuente base | `ttf-jetbrains-mono` | `jetbrains-mono-fonts-all` | `fonts-jetbrains-mono` | (binario, §4) |
-| Inconsolata | fuente | `ttf-inconsolata` | `levien-inconsolata-fonts` | `fonts-inconsolata` | (manual) |
+| python-gobject | scripts de red y RiceEditor | `python-gobject` | `python3-gobject` | `python3-gi` | `python3-gobject` |
+| xdg-user-dirs | carpetas de usuario | `xdg-user-dirs` | `xdg-user-dirs` | `xdg-user-dirs` | `xdg-user-dirs` |
+| JetBrains Mono | fuente base | `ttf-jetbrains-mono` | `jetbrains-mono-fonts-all` | `fonts-jetbrains-mono` | (Nerd Font, §4) |
+| Inconsolata | fuente | `ttf-inconsolata` | `levien-inconsolata-fonts` | `fonts-inconsolata` | (a mano) |
+| herramientas | descargas, extracción y red | `git curl unzip zstd tar fontconfig iproute2` | igual (`iproute`) | igual | igual |
+
+¹ Debian 12 y Ubuntu 24.04 traen ImageMagick 6, que no tiene el comando `magick`.
+El instalador crea `~/.local/bin/magick`, que llama a `convert`.
+² En Debian/Ubuntu el binario se llama `batcat`. El instalador crea el enlace
+`~/.local/bin/bat` y el `.zshrc` también lo tiene en cuenta.
+³ El `.zshrc` y fzf-tab usan opciones de **fzf ≥ 0.58**. Si la versión de tu distro
+es más antigua (Debian 12/13, Ubuntu 24.04), el instalador pone el binario oficial en `~/.local/bin/fzf`.
 
 ---
 
-## 3. CLI que puede faltar en Debian/openSUSE
+## 3. Binarios de respaldo (si la distro no los trae)
 
-`eza` y `bottom` no siempre están en repos (sobre todo Debian estable/Ubuntu LTS).
-El `install.sh` los instala como **binario oficial** en `~/.local/bin/` **solo si
-no existen** ya como paquete:
+Se instalan como **binario oficial** en `~/.local/bin/`, y **solo si** el comando no existe ya:
 
-- **eza** → [eza-community/eza](https://github.com/eza-community/eza/releases) (`*-x86_64-unknown-linux-gnu.tar.gz`)
-- **bottom** (`btm`) → [ClementTsang/bottom](https://github.com/ClementTsang/bottom/releases)
+| Herramienta | Cuándo | Origen |
+|---|---|---|
+| **eza** | Debian 12 | [eza-community/eza](https://github.com/eza-community/eza/releases) (build musl) |
+| **bottom** (`btm`) | Fedora, Debian, Ubuntu | [ClementTsang/bottom](https://github.com/ClementTsang/bottom/releases) (build musl) |
+| **fzf** | versión < 0.58 | [junegunn/fzf](https://github.com/junegunn/fzf/releases) |
+| **Neovim** | versión < 0.12 | [neovim/neovim](https://github.com/neovim/neovim/releases) → `/opt/nvim`, enlace en `/usr/local/bin/nvim` |
 
 ---
 
-## 4. Componentes que NO están en repos (universales)
-
-Se resuelven igual en **todas** las distros (compilar o binario oficial):
+## 4. Componentes que NO están en los repos (iguales en todas las distros)
 
 | Componente | Rol | Método | Requisito |
 |---|---|---|---|
-| **eww** | widgets: cheatsheet (`super+c`) y tarjeta de perfil | compilar (`cargo`, backend X11) | dependencias `BUILD` |
-| **i3lock-color** | bloqueo de pantalla con blur | compilar (autotools) | dependencias `BUILD` |
-| **yazi** (`yazi`+`ya`) | gestor de archivos TUI | binario oficial → `~/.local/bin` | — |
-| **lazydocker** | gestor Docker TUI | binario oficial → `~/.local/bin` | — |
-| **Neovim 0.12** | editor (config usa `vim.pack`, requiere ≥0.12) | tarball oficial → `/opt/nvim-0.12` + symlink | — |
-| **JetBrainsMono Nerd Font** | fuente principal (glifos/iconos) | descarga de nerd-fonts | — |
+| **yazi** (`yazi` + `ya`) | gestor de archivos en terminal | binario oficial (musl) → `~/.local/bin` | — |
+| **lazydocker** | gestor de Docker en terminal | binario oficial → `~/.local/bin` | — |
+| **eww** | widgets: hoja de atajos (`super+c`) y tarjeta de perfil | compilar (`cargo`, backend X11) → `~/.local/bin/eww` | `--build`, Rust ≥ 1.85 ⁴ |
+| **i3lock-color** | bloqueo de pantalla con desenfoque | compilar (autotools) → `/usr/local/bin/i3lock` | `--build` |
+| **JetBrainsMono Nerd Font** | fuente principal (glifos e iconos) | descarga de nerd-fonts → `~/.local/share/fonts` | — |
 | Fuentes de iconos | Font Awesome, Material Design, Phosphor… | **incluidas** en `assets/fonts/` | — |
-| Temas GTK `*-zk` | apariencia GTK por tema | descarga `gh0stzk.github.io/pkgs` | — |
-| Iconos `TokyoNight-SE`, `Catppuccin-Mocha`, `Hack` | iconos por tema | descarga `gh0stzk.github.io/pkgs` | — |
-| Cursor `Qogirr-Dark` | cursor | descarga `gh0stzk.github.io/pkgs` | — |
+| Temas GTK `*-zk` | apariencia GTK de cada tema | descarga de `gh0stzk.github.io/pkgs` → `~/.local/share/themes` | — |
+| Iconos `TokyoNight-SE`, `Catppuccin-Mocha`, `Hack` | iconos de cada tema | descarga de `gh0stzk.github.io/pkgs` → `~/.local/share/icons` | — |
+| Cursor `Qogirr-Dark` | cursor | descarga de `gh0stzk.github.io/pkgs` → `~/.local/share/icons` | — |
+| fzf-tab, zsh-history-substring-search | plugins de zsh | `git clone` → `~/.config/zsh/plugins` | — |
 
-> El **`eww`** y el **`i3lock-color`** solo se compilan si respondes `y` a la
-> pregunta del instalador. Los 3 temas usan **polybar**; `eww` se usa solo para la
-> **cheatsheet** (`super+c`) y la tarjeta de perfil — sin `eww` esas dos cosas no
-> aparecen, pero los temas funcionan. Sin `i3lock-color`, no hay bloqueo de pantalla.
+⁴ Si el Rust de tu distro es más antiguo, el instalador usa **rustup** en `~/.cargo`
+(solo para tu usuario, sin tocar el sistema). Es el caso de Debian 12.
+
+> **eww** e **i3lock-color** solo se compilan con `--build` (o si respondes `y`).
+> Los 3 temas usan **polybar**, así que funcionan sin ellos. Solo faltarán la hoja de
+> atajos (`super+c`), la tarjeta de perfil y el bloqueo de pantalla.
+> En Arch también puedes instalarlos desde AUR (`eww`, `i3lock-color`) con paru o yay.
 
 ---
 
 ## 5. Notas y limitaciones por distro
 
-- **Arch**: es la distro de origen (gh0stzk). `eww`, `i3lock-color`, `xwinwrap`
-  también están en AUR; si usas un helper (paru/yay) puedes instalarlos desde ahí
-  en vez de compilar.
-- **Fedora**: requiere **RPM Fusion** (el instalador lo habilita). Es la distro de
-  referencia probada.
-- **Debian/Ubuntu**:
-  - `eza` y `bottom` se instalan como binario (§3).
-  - `feh`+WebP: si los wallpapers `.webp` no cargan, instala un `libimlib2` con
-    soporte WebP o convierte los wallpapers a `.jpg`.
-  - El nombre del agente polkit puede variar (`policykit-1-gnome` /
-    `polkit-1-auth-agent-gnome` según versión).
-  - `polybar`/`alacritty` requieren Debian 12+ o Ubuntu 22.04+.
-- **openSUSE**: soporte básico; algunos plugins de zsh y `webp-pixbuf-loader` puede
-  que haya que instalarlos a mano.
+- **Arch**: es la distro de origen del rice (gh0stzk). Todos los paquetes están en los
+  repos oficiales. El instalador ejecuta `pacman -Syu`, lo que actualiza el sistema.
+- **Fedora**: todo está en los repos oficiales; no hace falta RPM Fusion.
+  `bottom` no está empaquetado, así que se instala como binario. El `lxpolkit` de
+  Fedora no incluye el ejecutable, así que se usa el agente de MATE (`mate-polkit`).
+- **Debian 12 / Ubuntu 24.04**:
+  - Traen **picom 9.1** (Debian 12) y **picom 10** (Ubuntu 24.04), que no tienen el
+    sistema de animaciones de picom 12+. picom arranca y aplica sombras y
+    transparencias, pero **sin animaciones**.
+  - Debian 12 trae polybar 3.6; el resto, 3.7.
+  - `fzf`, `eza` (solo Debian 12) y Neovim se sustituyen por binarios oficiales (§3).
+  - ImageMagick 6: se crea el comando `magick` de compatibilidad (§2).
+- **Debian 13**: trae picom 12.5 (con animaciones). `fzf` y Neovim se sustituyen por binarios.
+- **Ubuntu**: el instalador activa el repositorio `universe` si hace falta.
+- **openSUSE**: soporte **experimental**. No se prueba automáticamente; algunos
+  plugins de zsh y `webp-pixbuf-loader` pueden requerir instalación manual.
+- **Solo x86_64**: los temas de gh0stzk y los binarios descargados son para x86_64.
+- **Solo X11**: bspwm no funciona en Wayland. Tu gestor de login (GDM, SDDM,
+  LightDM…) debe poder iniciar sesiones X11.
 
 ---
 
 ## 6. Añadir soporte a una distro nueva
 
-En `install.sh`, dentro del `case "$FAMILY"`, añade un bloque con:
+En `install.sh`, añade un bloque dentro de `case "$FAMILY"`:
 
 ```sh
 tudistro)
   PM_UP="<comando para refrescar índices>"
-  PM_IN="<comando para instalar>"
-  RUNTIME="<lista de paquetes de la tabla §2 con los nombres de tu distro>"
-  BUILD="<dependencias de compilación para eww/i3lock-color>" ;;
+  PM_IN="<comando para instalar sin preguntar>"
+  RUNTIME="<paquetes de la tabla §2 con los nombres de tu distro>"
+  BUILD="<dependencias de compilación de eww/i3lock-color>" ;;
 ```
 
-y añade su `ID`/`ID_LIKE` al `case` de detección al inicio. El resto del script
-(fuentes, temas, binarios, configs) ya es universal.
+y añade su `ID`/`ID_LIKE` al `case` de detección del principio. El resto del
+script (fuentes, temas, binarios, configs) ya es universal. Para probarlo, añade la
+imagen de contenedor a `tests/run-tests.sh` (ver [README → Pruebas](README.md#-pruebas-automáticas)).
 
 ---
 
@@ -160,10 +195,15 @@ y añade su `ID`/`ID_LIKE` al `case` de detección al inicio. El resto del scrip
 
 | Archivo | Qué controla |
 |---|---|
-| `.config/bspwm/bspwmrc` | arranque, reglas, autostart (incluye `dunst`, `WallWatch`) |
+| `.config/bspwm/bspwmrc` | arranque de la sesión: reglas y autostart (sxhkd, dunst, picom, polkit, WallWatch) |
 | `.config/bspwm/config/sxhkdrc` | atajos de teclado |
-| `.config/bspwm/rices/<tema>/` | cada tema: colores, wallpaper, barra |
-| `.config/bspwm/bin/` | scripts (Theme.sh, WallSelect, WallWatch, SysUpdate…) |
-| `.config/bspwm/bin/SysUpdate` | actualizar sistema (**detecta el gestor**) |
-| `.config/bspwm/bin/Updates` | contador de actualizaciones en la barra (**multi-distro**) |
-| `home/.zshrc` | shell zsh (prompt, plugins, aliases **multi-distro**) |
+| `.config/bspwm/config/system.ini` | red, batería y brillo para la barra (lo rellena `SetSysVars` en el primer inicio) |
+| `.config/bspwm/config/picom/` | compositor: sombras, esquinas, animaciones y reglas |
+| `.config/bspwm/rices/<tema>/theme-config.bash` | colores, wallpaper, bordes y opacidad de cada tema |
+| `.config/bspwm/rices/<tema>/config.ini` y `modules.ini` | polybar de cada tema |
+| `.config/bspwm/config/modules/*.sh` | aplican el tema activo a cada app (kitty, rofi, dunst, GTK, nvim…) |
+| `.config/bspwm/bin/` | scripts: Theme.sh, RiceSelector, WallSelect, WallWatch, PowerMenu, ScreenShoTer… |
+| `.config/bspwm/bin/SysUpdate` | actualizar el sistema (**detecta el gestor de paquetes**) |
+| `.config/bspwm/bin/Updates` | contador de actualizaciones de la barra (**multi-distro**) |
+| `.config/bspwm/bin/OpenApps` | apps de cada atajo (navegador, calculadora… usa la primera que encuentra) |
+| `home/.zshrc` | zsh: prompt, plugins y aliases **multi-distro** |

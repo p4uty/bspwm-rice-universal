@@ -10,6 +10,14 @@
 
 WIDGET_DIR="$HOME/.config/bspwm/eww"
 
+# Lanza la primera app disponible de la lista (los nombres cambian entre distros)
+first_of() {
+	for app in "$@"; do
+		command -v "$app" >/dev/null 2>&1 && { exec "$app"; }
+	done
+	dunstify -u low "OpenApps" "No se encontró ninguna de: $*"
+}
+
 case "$1" in
 	--menu)
 		RofiLauncher --launcher
@@ -61,16 +69,19 @@ case "$1" in
 		thunar
 		;;
 	--browser)
-		brave-browser
+		first_of brave-browser brave firefox chromium google-chrome-stable xdg-open
 		;;
 	--editor)
 		geany
 		;;
 	--telegram)
-		telegram-desktop
+		first_of telegram-desktop Telegram
 		;;
 	--whats)
-		brave-browser https://web.whatsapp.com/
+		xdg-open https://web.whatsapp.com/
+		;;
+	--calculator)
+		first_of gnome-calculator kcalc galculator qalculate-gtk mate-calc xcalc
 		;;
 	--soundcontrol)
 		pavucontrol

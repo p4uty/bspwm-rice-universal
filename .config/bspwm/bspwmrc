@@ -76,20 +76,26 @@ run picom --config "${HOME}"/.config/bspwm/config/picom/picom.conf
 # Launch xsettingsd
 run xsettingsd --config="${HOME}"/.config/bspwm/config/xsettingsd >/dev/null 2>&1
 
-# Launch eww daemon (Fedora: solo si eww esta instalado/compilado)
+# Launch eww daemon (solo si eww esta instalado/compilado)
 command -v eww >/dev/null 2>&1 && { pidof -q eww || { eww -c "${HOME}"/.config/bspwm/eww daemon & }; }
 
-# Launch clipboard daemon (Fedora: clipcat es de Arch; usar greenclip/clipmenu si se instala)
+# Launch clipboard daemon (opcional: solo si clipcat esta instalado)
 command -v clipcatd >/dev/null 2>&1 && run clipcatd
 
-# Launch polkit (Fedora: lxpolkit no existe; usar agente disponible)
-if command -v lxpolkit >/dev/null 2>&1; then
-    run lxpolkit
-elif [ -x /usr/libexec/polkit-gnome-authentication-agent-1 ]; then
-    run /usr/libexec/polkit-gnome-authentication-agent-1
-elif [ -x /usr/libexec/kf6/polkit-kde-authentication-agent-1 ]; then
-    run /usr/libexec/kf6/polkit-kde-authentication-agent-1
-fi
+# Launch polkit: usa el primer agente disponible (la ruta cambia entre distros)
+for agent in "$(command -v lxpolkit)" \
+    /usr/libexec/polkit-gnome-authentication-agent-1 \
+    /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 \
+    /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 \
+    /usr/libexec/polkit-mate-authentication-agent-1 \
+    /usr/lib/x86_64-linux-gnu/polkit-mate/polkit-mate-authentication-agent-1 \
+    /usr/libexec/kf6/polkit-kde-authentication-agent-1 \
+    /usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1; do
+    if [ -n "$agent" ] && [ -x "$agent" ]; then
+        pgrep -f "$(basename "$agent")" >/dev/null || "$agent" &
+        break
+    fi
+done
 
 # Auto-guardar el wallpaper por rice (persiste tras reiniciar)
 pgrep -f "bspwm/bin/WallWatch" >/dev/null || "$HOME"/.config/bspwm/bin/WallWatch &

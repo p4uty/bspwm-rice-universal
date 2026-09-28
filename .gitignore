@@ -5,3 +5,4 @@
 .config/bspwm/eww/colors.scss
 **/*.bak
 **/__pycache__/
+tests/results/
